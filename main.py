@@ -44,7 +44,13 @@ async def async_main(host, passwd):
             "Grid_P",
             "Home_P",
             "HomePv_P",
-            "HomeGrid_P"
+            "HomeGrid_P",
+            "Grid_L1_I",
+            "Grid_L1_P",
+            "Grid_L2_I",
+            "Grid_L2_P",
+            "Grid_L3_I",
+            "Grid_L3_P"
         ])
 
         device_local = data['devices:local']
@@ -82,5 +88,42 @@ async def async_main(host, passwd):
 
         # 11 Obtenir l'inverter state - Je sais pas ce que c'est
         writeMeasure(now, "plenticore", "Inverter_State", device_local['Inverter:State'].value)
+
+        # 12. Obtenir puissance et intensité grid  phase 1,2 et 3
+        writeMeasure(now, "plenticore", "Grid_L1_I", device_local['Grid_L1_I'].value)
+        writeMeasure(now, "plenticore", "Grid_L1_P", device_local['Grid_L1_P'].value)
+
+        writeMeasure(now, "plenticore", "Grid_L2_I", device_local['Grid_L2_I'].value)
+        writeMeasure(now, "plenticore", "Grid_L2_P", device_local['Grid_L2_P'].value)
+
+        writeMeasure(now, "plenticore", "Grid_L3_I", device_local['Grid_L3_I'].value)
+        writeMeasure(now, "plenticore", "Grid_L3_P", device_local['Grid_L3_P'].value)
+
+        #13.   information about the AC side of the inverter.
+        # Voir https://github.com/StrathCole/ioBroker.plenticore
+        dataAC = await client.get_process_data_values('devices:local:ac', [
+            "P",
+            "L1_I",
+            "L1_U",
+            "L1_P",
+            "L2_I",
+            "L2_U",
+            "L2_P",
+            "L3_I",
+            "L3_U",
+            "L3_P",
+        ])
+        device_ac_local = dataAC['devices:local:ac']
+        writeMeasure(now, "plenticore", "ac_P", device_ac_local['P'].value)
+        writeMeasure(now, "plenticore", "ac_L1_I", device_ac_local['L1_I'].value)
+        writeMeasure(now, "plenticore", "ac_L1_P", device_ac_local['L1_P'].value)
+        writeMeasure(now, "plenticore", "ac_L1_U", device_ac_local['L1_U'].value)
+        writeMeasure(now, "plenticore", "ac_L2_I", device_ac_local['L2_I'].value)
+        writeMeasure(now, "plenticore", "ac_L2_P", device_ac_local['L2_P'].value)
+        writeMeasure(now, "plenticore", "ac_L2_U", device_ac_local['L2_U'].value)
+        writeMeasure(now, "plenticore", "ac_L3_I", device_ac_local['L3_I'].value)
+        writeMeasure(now, "plenticore", "ac_L3_P", device_ac_local['L3_P'].value)
+        writeMeasure(now, "plenticore", "ac_L3_U", device_ac_local['L3_U'].value)
+
 
 asyncio.run(async_main(plenticore_ip, plenticore_password))
